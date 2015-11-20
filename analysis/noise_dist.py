@@ -18,20 +18,21 @@ def single_bin_dev(p):
     n_ss=len(p)
     p_av=[]
     hist_pts=[]
+    sig=[]
     for i in range (0,n_ss):
         pts=len(p[i])
-        p_av.append(sum(p[i])/len(p[i]))
-        var=sum([(a-p_av[i])*(a-p_av[i]) for a in p[i]])/len(p[i])
-        sig=math.sqrt(var)
-        #print(p[i][0]-p_av[i])
+        p_av.append(np.average(p[i]))
+        sig.append(np.std(p[i]))
+        #print(p_av[i],sig[i])
         for j in range(0,pts):
-            hist_pts.append((p[i][j]-p_av[i])/sig)
+            hist_pts.append((p[i][j]-p_av[i])/sig[i])
     return hist_pts
 
 def summed_bin_dev(p_tot):
     n_ss=len(p_tot)
     p_av=np.average(p_tot)
     sigma=np.std(p_tot)
+    #print(p_av,sigma)
     hist_pts=[]
     for i in range (0,n_ss):
         hist_pts.append((p_tot[i]-p_av)/sigma)

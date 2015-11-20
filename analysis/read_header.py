@@ -28,8 +28,8 @@ def read_head(f):
         elif "Freq width (GHz):" in line:
             fw_l=line.split()
             fw=float(fw_l[3])
-#print(sr)
+    #print(sr)
     searchfile.close()
     st=sr*1E-3/pt
-    #print(st)
+    #print("step size",st,sr,pt)
     return [cf,q,st,fc,fw,pt]
