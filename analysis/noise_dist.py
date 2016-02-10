@@ -32,7 +32,7 @@ def summed_bin_dev(p_tot):
     n_ss=len(p_tot)
     p_av=np.average(p_tot)
     sigma=np.std(p_tot)
-    #print(p_av,sigma)
+    print(p_av,sigma)
     hist_pts=[]
     for i in range (0,n_ss):
         hist_pts.append((p_tot[i]-p_av)/sigma)

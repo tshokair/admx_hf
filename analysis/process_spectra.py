@@ -7,6 +7,7 @@ from scipy import stats
 from bokeh.plotting import figure, show, output_file, vplot
 from clean import remove_spikes
 from fit_jpa import fit
+import calc_snr
 def process(rn):
 #rn=[201507310008]
 #hf="/admx/admx-hf_data/testStandData/2015/07/31/"+str(rn)+".hdr"
@@ -18,7 +19,7 @@ def process(rn):
     pf=open(df)
     p_in=pf.readlines()
     p_s=list(map(float,p_in[1100:16100]))
-    
+    q=pm[1]
     f_dc=np.linspace(1100*pm[2],pm[2]*16100,len(p_s))
     dw=(f_dc[len(f_dc)-1]-f_dc[0])/2
     f=np.linspace(cf-dw,cf+dw,len(f_dc))
@@ -36,11 +37,15 @@ def process(rn):
         if (i-3)%6==0 and i>3:
             j=j+6
     """
-    p_proc=[a/b-p_mean for a,b in zip(p,p_av)]
+    T=.5
+    p_proc=[a/b-1 for a,b in zip(p,p_av)]
+    del_s=calc_snr.delta_calc(p_proc,T,f,cf,cf/q,q)
+    var_s=calc_snr.var_calc(p_proc,T,f,cf,cf/q,q)
     gamma=pm[0]/pm[1]
     wf=wf=[4*(a-0.0008)*(a-0.0008)/gamma/gamma for a in f]
     p_w=[a/(1+b) for a,b in zip(p_proc,wf)]
-    return [f,p_w,cf,pm[2],p,p_proc,p_av]
+    return [f,p_w,cf,pm[2],p,p_proc,p_av,del_s,var_s]
+
 
 """
 pw1=process(201508042777)
