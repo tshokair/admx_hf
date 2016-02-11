@@ -67,10 +67,6 @@ fs=sort_from_indexes(s_ind,fs_uns)
 del_s=sort_from_indexes(s_ind,del_uns)
 var_s=sort_from_indexes(s_ind,var_uns)
 #pad each list so they can be added together
-x=np.linspace(0,len(f0),len(f0))
-dw=[]
-for i in range (0,len(f)):
-    dw.append((f[i][len(f[i])-1]-f[i][0])/2)
 pad_param=find_pad_param(f,fs[0])
 print(pad_param)
 wp=[]
@@ -224,7 +220,10 @@ p3_1.quad(top=hist4_1, bottom=1, left=edges4_1[:-1], right=edges4_1[1:],color='r
 
 
 
-
+x=np.linspace(0,len(f0),len(f0))
+dw=[]
+for i in range (0,len(f)):
+    dw.append((f[i][len(f[i])-1]-f[i][0])/2)
 spec_width=[]
 x_width=[]
 for i in range (0,len(f)):

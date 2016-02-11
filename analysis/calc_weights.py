@@ -9,11 +9,19 @@ def calc_weight_ij(var):
             w_ij.append(sum_var/vi)
 
     return w_ij
+def find_min_length(var):
+    min=len(var[0])
+    for i in range(0,len(var)):
+        if min>len(var[i]):
+            min=len(var[i])
+    return min
 def calc_weight_ijk(var):
     w=[]
-    for i in range(0,len(var[0])-2):
+    max_length=find_min_length(var)
+    for i in range(0,max_length):
         temp=[]
         for j in range(0,len(var)):
+            #print(i,j,var[j][i])
             #print(len(var[0]),len(var[j]))
             temp.append(var[j][i])
         w.append(calc_weight_ij(temp))
