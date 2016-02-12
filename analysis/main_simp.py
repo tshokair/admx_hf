@@ -71,25 +71,25 @@ for k in range(0,n_ss):
     sig_sq_ij_pad_w.append([a*b**2 for a,b in zip(sig_sq_ij_pad[k],w_ij[k])])
 #sum the powers and offset the subspectra for plotting
 #offset_snr are offset spectra, offset simply for plotting purposes.
-snr_c=[a/math.sqrt(b) if b!=0 else b for a,b in zip(delta_ij_pad_w[0],sig_sq_ij_pad_w[0])]
+normed_signal_c=[a/math.sqrt(b) if b!=0 else b for a,b in zip(delta_ij_pad_w[0],sig_sq_ij_pad_w[0])]
+snr_c=[1/math.sqrt(b) if b!=0 else b for b in sig_sq_ij_pad_w[0]]
 offset_snr=[]
-offset_dij=[]
-offset_sij=[]
+offset_normed_sig=[]
 offset=10
 offset_snr.append([a+offset for a in snr_c])
-offset_dij.append([a+offset/100 for a in delta_ij_pad_w[0]])
-offset_sij.append([a+offset/100 for a in sig_sq_ij_pad_w[0]])
+offset_normed_sig.append([a+offset for a in normed_signal_c])
 for i in range (1,n_ss):
-    snr=[a/math.sqrt(b) if b!=0 else b for a,b in zip(delta_ij_pad_w[i],sig_sq_ij_pad_w[i])]
-    offset_snr.append([a+offset*(i%19+1) for a in snr])
-    offset_dij.append([a+offset/100*(i%19+1) for a in delta_ij_pad_w[i]])
-    offset_sij.append([a+offset/100*(i%19+1) for a in sig_sq_ij_pad_w[i]])
+    normed_signal=[a/math.sqrt(b) if b!=0 else b for a,b in zip(delta_ij_pad_w[i],sig_sq_ij_pad_w[i])]
+    snr=[1/math.sqrt(b) if b!=0 else b for b in sig_sq_ij_pad_w[i]]
+    offset_snr.append([a for a in snr])
+    offset_normed_sig.append([a+offset*(i%19+1) for a in normed_signal])
+    normed_signal_c=[a+b for a,b in zip(normed_signal_c,normed_signal)]
     snr_c=[a+b for a,b in zip(snr_c,snr)]
-    del snr
+    del snr, normed_signal
 
 
 #make the plots
-plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,offset_dij)
+plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_normed_sig)
 
 
 

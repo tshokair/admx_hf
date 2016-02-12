@@ -18,7 +18,7 @@ def make_frequency_list(f):
     start_index=np.where(f_f==start_f)[0][0]+1
     stop_index=np.where(f_f==stop_f)[0][0]
     return [f_f,start_f,stop_f,start_index,stop_index]
-def plot_everything(n_ss,f,f0,snr_c,sp,p,w_ij,p_pad):
+def plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_normed_sig):
     colors = ["#4F81BD","#C05061","#9BBB59","#7D60A0","#F79646","#00008B","#EE1540","#556B2F","#DDA0DD","#FF8C00"]
     output_file("grand_spec.html")
     #plot just grand spectrum
@@ -35,17 +35,12 @@ def plot_everything(n_ss,f,f0,snr_c,sp,p,w_ij,p_pad):
     #plot all spectra
     p1=figure(x_axis_label="frequency [GHz]",y_axis_label="SNR",x_range=p1_0.x_range)
     for i in range (0,n_ss):
-        p1.line(f_f,sp[i],color=colors[i%len(colors)])
-    #plot the single bin deviations for each subspectra
-    p2=figure(x_axis_label="Single Spectra Deviation from Mean [standard deviations]",y_axis_label="Number of bins",x_range=[-10,10],y_axis_type="log")
-    #need this piece so log scale displays
-    hist_pts=single_bin_dev(p)
-    hist1, edges1 = np.histogram(hist_pts,bins=225)
-    #need this piece so log scale displays
-    for i in range(0,len(hist1)):
-        if hist1[i]==0:
-            hist1[i]+=1
-    p2.quad(top=hist1, bottom=1, left=edges1[:-1], right=edges1[1:],color='green')
+        p1.line(f_f,offset_snr[i],color=colors[i%len(colors)])
+    #some formating to ensure axis line up
+    p1.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+    p1_0.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+    p1_1.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+
     #plot the single bin devaitions for the grand stspectra on linear and log
     hist_pts_sum=summed_bin_dev(snr_c[st_i:sp_i])
     hist2, edges2 = np.histogram(hist_pts_sum,bins=50)
@@ -84,17 +79,44 @@ def plot_everything(n_ss,f,f0,snr_c,sp,p,w_ij,p_pad):
     p4=figure(x_axis_label="Tuning Steps",y_axis_label="Central Frequncy [GHz]")
     p4.diamond(x,f0)
     p4.multi_line(x_width, spec_width)
-    #some formating to ensure axis line up
-    p1.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
-    p1_0.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
-    p1_1.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+
     #plot the weighting functions
-    p5=figure(x_axis_label="f")
+    p5=figure(x_axis_label="f",y_axis_label="weighting value")
     for i in range (0,n_ss):
         p5.line(f_f,w_ij[i],color=colors[i%len(colors)])
-    #plot the padded power
-    p6=figure(x_axis_label="f")
+    #plot the padded normalized signal (summed and individual)
+    #summed
+    p6_0=figure(x_axis_label="frequency [GHz]",y_axis_label="Combined Normalized Signal")
+    #p6_0.line(f_f[st_i:sp_i],normed_signal_c[st_i:sp_i])
+    p6_0.line(f_f,normed_signal_c)
+    #individual
+    p6=figure(x_axis_label="frequency [GHz]",y_axis_label="Normalized Signal",x_range=p6_0.x_range)
     for i in range (0,n_ss):
-        p6.line(f_f,p_pad[i],color=colors[i%len(colors)])
-    show (vplot(p1,p1_0,p1_1,p2,p3,p3_0,p3_1,p4,p5,p6))
+        p6.line(f_f,offset_normed_sig[i],color=colors[i%len(colors)])
+    p6.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+    p6_0.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
+    #plot the single bin deviations for each subspectra
+    p6_1=figure(x_axis_label="Deviation from Grand Mean [standard deviations]",y_axis_label="Number of bins",x_range=[-10,10],y_axis_type="log")
+    #need this piece so log scale displays
+    hist_pts=summed_bin_dev(normed_signal_c[st_i:sp_i])
+    hist1, edges1 = np.histogram(hist_pts,bins=50)
+    #need this piece so log scale displays
+    for i in range(0,len(hist1)):
+        if hist1[i]==0:
+            hist1[i]+=1
+    p6_1.quad(top=hist1, bottom=1, left=edges1[:-1], right=edges1[1:],color='green')
+    #plot the six bin devaitions for the grand stspectra both on log scale
+    ns_c6=six_bin_av(normed_signal_c[st_i:sp_i])
+    p6_2=figure(x_axis_label="Deviation from 6 Bin Grand Mean [standard deviations]",y_axis_label="Number of bins",y_axis_type="log")
+    hist_pts_sum_ns6=summed_bin_dev(ns_c6)
+    histns6, edgesns6 = np.histogram(hist_pts_sum_ns6,bins=50)
+    histns6_log=list(histns6)
+    edgesns6_log=list(edgesns6)
+    for i in range(0,len(histns6_log)):
+        if histns6_log[i]==0:
+            histns6_log[i]+=1
+            edgesns6_log[i]+=1
+    p6_2.quad(top=histns6_log, bottom=1, left=edgesns6_log[:-1], right=edgesns6_log[1:],color='red',legend="Data")
+    #show (vplot(p1,p1_0,p1_1,p2,p3,p3_0,p3_1,p4,p5,p6))
+    show(gridplot([[p1,p6],[p1_0,p6_0],[p3_0,p6_1],[p3_1,p6_2],[p5,p4]]))
     return 0
