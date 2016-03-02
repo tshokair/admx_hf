@@ -13,17 +13,21 @@ def process(rn,date,pm):
 #hf="/admx/admx-hf_data/testStandData/2015/07/31/"+str(rn)+".hdr"
 #df="/admx/admx-hf_data/testStandData/2015/07/31/"+str(rn)+".psa"
     df="/mnt/nfs/admx/admx-hf_data/experimentData/"+date+"/"+rn+".psa"
+    #hf="/Users/shokair1/axion/hf_data/"+str(rn)+".hdr"
+    #df="/Users/shokair1/axion/hf_data/"+str(rn)+".psa"
+    #pm=read_head(hf)
     cf=(pm[0])
     pf=open(df)
     p_in=pf.readlines()
     p_s=list(map(float,p_in[1100:16100]))
     q=pm[1]
-    f_dc=np.linspace(1100*pm[2],pm[2]*16100,len(p_s))
+    f_dc=np.linspace(1100*pm[2],pm[2]*14600,len(p_s))
     dw=(f_dc[len(f_dc)-1]-f_dc[0])/2
     f=np.linspace(cf-dw,cf+dw,len(f_dc))
     #print(len(p_s),len(f))
-    p=remove_spikes(p_s,f,pm[2])
+    #p=remove_spikes(p_s,f,pm[2])
     #print(len(p))
+    p=[a for a in p_s]
     #print(pm[2],f[0],f[len(f)-1])
     #p_av=fit(f,p,pm[0],pm[0]/pm[1])
     p_av=savgol_filter(p,2501,4)

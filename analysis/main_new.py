@@ -4,6 +4,7 @@
     updated 10/8/15 to fix some bugs with coadding and incorporate histogram plotting
     updated 2/10/16 to add snr spectra as well as to take some of the logic out of main and move it to separte programs.
     updated 2/27/16 by slewis to accept date input and feed input to shell script.
+    updated 02/27/16 by slewis to accept date input and feed date to shell script, which generates the spectra list    
 """
 import numpy as np
 import random
@@ -15,6 +16,7 @@ import pylab as pl
 import matplotlib.pyplot as plt
 import time
 import subprocess
+import subprocess # Used to call shell script
 
 from pad_list import find_pad_param
 from pad_list import pad_l
@@ -44,7 +46,7 @@ def processed_streams(l):
 # Also checks to make sure there is a folder corresponding to the given date.
 while True:
     try:
-        date = int(input('Enter date (YYYYMMDD): '))
+        date = int(input("Enter date (YYYYMMDD): "))
         if len(str(date)) != 8:
             print("This is not a complete date. Please use YYYYMMDD format.")
             continue
@@ -58,7 +60,6 @@ while True:
     except ValueError:
         print("Invalid input. Date must be entered in YYYYMMDD format using only numbers.")
 
-
 #get the processed streams
 p_array=call_process("./p_spectra.txt",str(date))
 f=processed_streams(p_array).f
@@ -70,6 +71,7 @@ delta_ij=processed_streams(p_array).delta_ij
 n_ss=len(f)
 
 #pad the streams with zeros for co-adding
+print(len(fs))
 pad_param=find_pad_param(f,fs[0])
 p_pad=[]
 delta_ij_pad=[]
