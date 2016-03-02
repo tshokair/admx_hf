@@ -8,13 +8,11 @@ from bokeh.plotting import figure, show, output_file, vplot
 from clean import remove_spikes
 from fit_jpa import fit
 import calc_snr
-def process(rn):
+def process(rn,date,pm):
 #rn=[201507310008]
 #hf="/admx/admx-hf_data/testStandData/2015/07/31/"+str(rn)+".hdr"
 #df="/admx/admx-hf_data/testStandData/2015/07/31/"+str(rn)+".psa"
-    hf="/Users/shokair1/axion/hf_data/"+str(rn)+".hdr"
-    df="/Users/shokair1/axion/hf_data/"+str(rn)+".psa"
-    pm=read_head(hf)
+    df="/mnt/nfs/admx/admx-hf_data/experimentData/"+date+"/"+rn+".psa"
     cf=(pm[0])
     pf=open(df)
     p_in=pf.readlines()
