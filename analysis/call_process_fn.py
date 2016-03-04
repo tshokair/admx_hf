@@ -3,16 +3,24 @@
     This function calls the processing functions on a list of
     files and returns the various processed and sorted streams 
     as a single list
-    
+    Edited 02/28/16 by slewis to accept additional date input
+    Date input is fed into make par array, read header.   
 """
 import numpy as np
+import read_par_file
 from process_spectra import process
 from sort_spec import sort_from_indexes
-def call_process(f):
+def call_process(f,date):
+   # print("File is",f)
     runF=open(f,"r")
     #runF=open("p_spec_runs.txt","r")
-    r_in=runF.readlines()
-    rn=list(map(int,r_in))
+    #r_in=runF.readlines()
+    r_in=runF.read().splitlines()
+    rn=[]
+    for line in r_in:
+       rn.append(line)
+    par_array=read_par_file.make_par_array(date)
+    step_size=read_par_file.read_header(date)
     f0=[]
     # lists to fill
     p_uns=[]
@@ -23,12 +31,11 @@ def call_process(f):
     var_uns=[]
     wf=[]
     wp=[]
-    n_ss=len(rn)
-    #n_ss=25
+    n_ss=25
     #Call functions to process data and fill lists
     for i in range (0,n_ss):
         print("Processing",rn[i])
-        ls=process(rn[i])
+        ls=process(rn[i],date,[float(par_array[i][1]),float(par_array[i][2]),step_size])
         p_uns.append(ls[5])
         f0_uns.append(ls[2])
         f_uns.append(ls[0])
