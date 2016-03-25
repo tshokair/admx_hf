@@ -6,6 +6,7 @@ from bokeh.models import PrintfTickFormatter
 from six_bin_average import six_bin_av
 from noise_dist import single_bin_dev
 from noise_dist import summed_bin_dev
+import pickle
 def make_frequency_list(f,fs):
 #create the full frequency list for plotting
     f_min=np.amin(f)
@@ -113,11 +114,14 @@ def plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_nor
     #summed
     p6_0=figure(x_axis_label="frequency [GHz]",y_axis_label="Combined Normalized Signal")
     p6_0.line(f_f[st_i:sp_i],normed_signal_c[st_i:sp_i])
+    pickle.dump(normed_signal_c,open('normed_signal_c.pkl','wb'))
     #p6_0.line(f_f,normed_signal_c)
     #individual
     p6=figure(x_axis_label="frequency [GHz]",y_axis_label="Normalized Signal",x_range=p6_0.x_range)
     for i in range (0,n_ss):
         p6.line(f_f,offset_normed_sig[i],color=colors[i%len(colors)])
+    pickle.dump(f_f,open('full_f.pkl','wb'))
+    pickle.dump(offset_normed_sig,open('offset_normed_sig.pkl','wb'))
     p6.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
     p6_0.yaxis[0].formatter = PrintfTickFormatter(format="%5f")
     #plot the single bin deviations for each subspectra
