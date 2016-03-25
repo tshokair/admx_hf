@@ -31,7 +31,7 @@ def call_process(f,date):
     var_uns=[]
     wf=[]
     wp=[]
-    n_ss=25
+    n_ss=160
     #Call functions to process data and fill lists
     for i in range (0,n_ss):
         print("Processing",rn[i])

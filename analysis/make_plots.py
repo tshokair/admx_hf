@@ -6,23 +6,48 @@ from bokeh.models import PrintfTickFormatter
 from six_bin_average import six_bin_av
 from noise_dist import single_bin_dev
 from noise_dist import summed_bin_dev
-def make_frequency_list(f):
+def make_frequency_list(f,fs):
 #create the full frequency list for plotting
-    f_f=np.append(f[0],f[1])
-    for i in range(2,len(f)):
-        f_f=np.append(f_f,f[i])
-    f_f=np.unique(f_f)
-
-    start_f=f[len(f)-1][0]
-    stop_f=f[0][len(f[0])-1]
-    start_index=np.where(f_f==start_f)[0][0]+1
-    stop_index=np.where(f_f==stop_f)[0][0]
+    f_min=np.amin(f)
+    f_max=np.amax(f)
+    f_pts=int((f_max-f_min)/fs)
+    print(f_pts, f_min,f_max)
+    f_f=np.linspace(f_min,f_max,f_pts)
+    ns=len(f)
+    nf=len(f_f)
+    print(ns-40+1)
+    if ns<40:
+        start_f=f_f[0]
+        stop_f=f_f[nf-1]
+        start_index=0
+        stop_index=nf-1
+    else:
+        start_f=np.amin(f[39])
+        ls=(ns//40-1)*40
+        stop_f=np.amax(f[ls])
+        nf=len(f_f)
+        for i in range (0,nf-1):
+            if f_f[i]<start_f<f_f[i+1]:
+                start_index=i
+                print("start",f_f[i],start_f)
+                break
+        for i in range (1,nf):
+            if f_f[nf-i-1]<stop_f<f_f[nf-i]:
+                print("stop",f_f[nf-i],stop_f)
+                stop_index=nf-i
+                break
+    
+    #start_index=np.where(abs(f_f-start_f)<(fs/2))[0][0]+1
+    #stop_index=np.where(abs(stop_f-f_f)<(fs/2))[0][0]
+    print("frequency range",start_f,"-",stop_f)
+    print("region of interest:[",start_index,",",stop_index,"]")
+    print(f_f[start_index],f_f[stop_index])
     return [f_f,start_f,stop_f,start_index,stop_index]
-def plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_normed_sig):
+def plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_normed_sig,fs):
     colors = ["#4F81BD","#C05061","#9BBB59","#7D60A0","#F79646","#00008B","#EE1540","#556B2F","#DDA0DD","#FF8C00"]
     output_file("grand_spec.html")
     #plot just grand spectrum
-    temp=make_frequency_list(f)
+    temp=make_frequency_list(f,fs)
     f_f,st_f,sp_f,st_i,sp_i=temp[0],temp[1],temp[2],temp[3],temp[4]
     del temp
     p1_0=figure(x_axis_label="frequency [GHz]",y_axis_label="Combined SNR")
@@ -87,8 +112,8 @@ def plot_everything(n_ss,f,f0,snr_c,offset_snr,p,w_ij,normed_signal_c,offset_nor
     #plot the padded normalized signal (summed and individual)
     #summed
     p6_0=figure(x_axis_label="frequency [GHz]",y_axis_label="Combined Normalized Signal")
-    #p6_0.line(f_f[st_i:sp_i],normed_signal_c[st_i:sp_i])
-    p6_0.line(f_f,normed_signal_c)
+    p6_0.line(f_f[st_i:sp_i],normed_signal_c[st_i:sp_i])
+    #p6_0.line(f_f,normed_signal_c)
     #individual
     p6=figure(x_axis_label="frequency [GHz]",y_axis_label="Normalized Signal",x_range=p6_0.x_range)
     for i in range (0,n_ss):

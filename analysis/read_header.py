@@ -14,7 +14,7 @@ def read_head(f):
             q=float(q_l[2])
         elif "Freq change/cavity step (GHz)" in line:
             fs_l=line.split()
-            print(fs_l)
+            #print(fs_l)
             fs=float(fs_l[4])
         elif "FFT size (pts)" in line:
             pt_l=line.split()
